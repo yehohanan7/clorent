@@ -7,13 +7,13 @@
 
 
 (deftest should-decode-string
-  (is (= ["abcde" ""] (decode-data "5:abcde")))
-  (is (= ["abcde" "fgh"] (decode-data "5:abcdefgh"))))
+  (is (= ["abcde" []] (decode-data "5:abcde")))
+  (is (= ["abcde" (seq "fgh")] (decode-data "5:abcdefgh"))))
 
 
 (deftest should-decode-data
-  (is (= [57 ""] (decode-data "i57e")))
-  (is (= [57 "2:ab"] (decode-data "i57e2:ab"))))
+  (is (= [57 []] (decode-data "i57e")))
+  (is (= [57 (seq "2:ab")] (decode-data "i57e2:ab"))))
 
 
 (deftest should-decode-list
