@@ -2,35 +2,36 @@
   (:require [clojure.core.match :refer [match]])
   (:require [clojure.string :as str]))
 
-(defn- to->str [xs]
+(defn- to-str [xs]
   (apply str xs))
 
-(defn- to->num [[_ & _ :as xs]]
+(defn- to-num [xs]
   (read-string (apply str xs)))
 
-
-(defn- decode-string [[x & xs] acc]
-  (if-let [length (and (= \: x) (to->num acc))]
-    [(->> xs (take length) to->str) (drop length xs)]
+(defn decode-string [[x & xs] acc]
+  (if (= \: x)
+    [(to-str (take (to-num acc) xs)) (drop (to-num acc) xs)]
     (recur xs (conj acc x))))
 
-(defn- decode-integer [[x & xs] acc]
+(defn decode-integer [[x & xs] acc]
   (if (= \e x)
-    [(to->num acc) xs] 
+    [(to->num acc) (or xs [])]
     (recur xs (conj acc x))))
 
-(defn- decode-list [xs acc]
-  :unsupported)
+(defn decode-list [[x & xs :as input] acc]
+  (if-let [[value rest]  (and (not= \e x) (decode-data input))] 
+    (recur rest (conj acc value))
+    [acc xs]))
 
 (defn- decode-dict [xs acc]
   :unsupported)
 
 (defn decode-data [[x & xs :as input]]
-  (cond
-    (= \d x) (decode-dict xs {})
-    (= \l x) (decode-list xs [])
-    (= \i x) (decode-integer xs [])
-    :else (decode-string (seq input) [])))
+  (condp = x
+    \d (decode-dict xs {})
+    \l (decode-list xs [])
+    \i (decode-integer xs [])
+    (decode-string input [])))
 
 (defn decode [^String xs]
   "Decodes torrent string into clojure map."
