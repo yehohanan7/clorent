@@ -3,10 +3,18 @@
   (:use clorent.decoder)
   (:require [clojure.java.io :as io]))
 
-(def torrent-file (io/file
-                (io/resource 
-                 "taocp.torrent")))
+(def test-torrent (-> "taocp.torrent" io/resource io/file slurp))
 
-(deftest should_decode_torrent_file
-  (let [torrent (decode (slurp torrent-file))]
-    (is (contains? torrent :raw))))
+
+(deftest should-decode-string
+  (is (= ["abcde" ""] (decode-data "5:abcde")))
+  (is (= ["abcde" "fgh"] (decode-data "5:abcdefgh"))))
+
+
+(deftest should-decode-data
+  (is (= [57 ""] (decode-data "i57e")))
+  (is (= [57 "2:ab"] (decode-data "i57e2:ab"))))
+
+
+(deftest should-decode-list
+  (is (= [["ab" "xyz" 57] ""] (decode-data "l2:ab3:xyzi57e"))))

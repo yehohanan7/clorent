@@ -10,4 +10,5 @@
   
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [clojurewerkz/buffy "1.0.0"]
-                 [org.clojure/tools.nrepl "0.2.7"]])
+                 [org.clojure/tools.nrepl "0.2.7"]
+                 [org.clojure/core.match "0.3.0-alpha4"]])
