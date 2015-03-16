@@ -1,6 +1,5 @@
 (ns clorent.decoder
   (:require [clojure.core.match :refer [match]])
-  (:require [clorent.sugar :as sugar])
   (:require [clojure.string :as str]))
 
 
