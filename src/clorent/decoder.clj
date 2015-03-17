@@ -3,14 +3,14 @@
   (:require [clojure.string :as str]))
 
 
-(defn string-decoder [f]
+(defn string-decoder []
   (fn [step]
-    (let [prefix (volatile! "") string (volotile! "")]
+    (let [prefix (volatile! "") string (volatile! "")]
       (fn [r x]
         (cond
           (= \: x) (initialize the string accumulator)
-          (string?) (append the character to the string)
-          (step r (f x)))))))
+          (constructing string?) (append the character to the string)
+          (string constructed?) (step r (constructed string)))))))
 
 (def decoder
   (comp
