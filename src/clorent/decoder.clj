@@ -5,10 +5,12 @@
 
 (defn string-decoder []
   (fn [step]
-    (let [prefix (volatile! "") string (volatile! "")]
+    (let [prefix (volatile! "") string (volatile! nil)]
       (fn [r x]
         (cond
-          (= \: x) (initialize the string accumulator)
+          (= \: x) (do (vswap! prefix read-string) (vreset! string ""))
+          
+          (not (nil? @string)) (do (vswap! prefx dec) )
           (constructing string?) (append the character to the string)
           (string constructed?) (step r (constructed string)))))))
 
