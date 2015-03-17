@@ -2,6 +2,29 @@
   (:require [clojure.core.match :refer [match]])
   (:require [clojure.string :as str]))
 
+
+(defn string-decoder [f]
+  (fn [step]
+    (let [prefix (volatile! "") string (volotile! "")]
+      (fn [r x]
+        (cond
+          (= \: x) (initialize the string accumulator)
+          (string?) (append the character to the string)
+          (step r (f x)))))))
+
+(def decoder
+  (comp
+   (string-decoder)
+   (integer-decoder)
+   (list-decoder)
+   (dict-decoder)))
+
+(defn decode [xs]
+  (transduce decoder {} xs))
+
+
+(declare decode-data)
+
 (defn- to-str [xs]
   (apply str xs))
 
@@ -9,22 +32,28 @@
   (read-string (apply str xs)))
 
 (defn decode-string [[x & xs] acc]
-  (if (= \: x)
-    [(to-str (take (to-num acc) xs)) (drop (to-num acc) xs)]
+  (if-let [length (and (= \: x) (to-num acc))]
+    (vector (to-str (take length xs)) (drop length xs))
     (recur xs (conj acc x))))
 
 (defn decode-integer [[x & xs] acc]
   (if (= \e x)
-    [(to->num acc) (or xs [])]
+    [(to-num acc) (or xs [])]
     (recur xs (conj acc x))))
 
 (defn decode-list [[x & xs :as input] acc]
   (if-let [[value rest]  (and (not= \e x) (decode-data input))] 
     (recur rest (conj acc value))
-    [acc xs]))
+    [acc (or xs [])]))
 
-(defn- decode-dict [xs acc]
-  :unsupported)
+(defn- decode-dict [[x & xs :as input] acc]
+  (if (= \e x) [acc (or xs [])]
+
+      (iterate #() [input acc] )
+      
+      (let [[key rest*] (decode-data input)
+            [value rest] (decode-data rest*)])
+      (recur rest (assoc acc key value))))
 
 (defn decode-data [[x & xs :as input]]
   (condp = x

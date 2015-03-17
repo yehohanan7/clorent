@@ -17,4 +17,4 @@
 
 
 (deftest should-decode-list
-  (is (= [["ab" "xyz" 57] ""] (decode-data "l2:ab3:xyzi57e"))))
+  (is (= [["ab" "xyz" 57] []] (decode-data "l2:ab3:xyzi57ee"))))
