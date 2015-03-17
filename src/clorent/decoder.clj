@@ -2,40 +2,21 @@
   (:require [clojure.core.match :refer [match]])
   (:require [clojure.string :as str]))
 
-
-(defn string-decoder []
-  (fn [step]
-    (let [prefix (volatile! "") string (volatile! nil)]
-      (fn [r x]
-        (cond
-          (= \: x) (do (vswap! prefix read-string) (vreset! string ""))
-          
-          (not (nil? @string)) (do (vswap! prefx dec) )
-          (constructing string?) (append the character to the string)
-          (string constructed?) (step r (constructed string)))))))
-
-(def decoder
-  (comp
-   (string-decoder)
-   (integer-decoder)
-   (list-decoder)
-   (dict-decoder)))
-
-(defn decode [xs]
-  (transduce decoder {} xs))
-
-
 (declare decode-data)
 
 (defn- to-str [xs]
   (apply str xs))
 
 (defn- to-num [xs]
-  (read-string (apply str xs)))
+  (if (empty? xs) 0
+      (read-string (apply str xs))))
+
+(defn- apply-first [[x y] f]
+  (vector (f x) y))
 
 (defn decode-string [[x & xs] acc]
-  (if-let [length (and (= \: x) (to-num acc))]
-    (vector (to-str (take length xs)) (drop length xs))
+  (if (= \: x)
+    (-> acc to-num (split-at xs) (apply-first to-str))
     (recur xs (conj acc x))))
 
 (defn decode-integer [[x & xs] acc]
@@ -48,14 +29,11 @@
     (recur rest (conj acc value))
     [acc (or xs [])]))
 
-(defn- decode-dict [[x & xs :as input] acc]
+(defn decode-dict [[x & xs :as input] acc]
   (if (= \e x) [acc (or xs [])]
-
-      (iterate #() [input acc] )
-      
       (let [[key rest*] (decode-data input)
-            [value rest] (decode-data rest*)])
-      (recur rest (assoc acc key value))))
+            [value rest] (decode-data rest*)]
+        (recur rest (assoc acc key value)))))
 
 (defn decode-data [[x & xs :as input]]
   (condp = x
