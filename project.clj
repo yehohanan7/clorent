@@ -11,4 +11,5 @@
   :dependencies [[org.clojure/clojure "1.7.0-alpha5"]
                  [clojurewerkz/buffy "1.0.0"]
                  [org.clojure/tools.nrepl "0.2.7"]
-                 [org.clojure/core.match "0.3.0-alpha4"]])
+                 [org.clojure/core.match "0.3.0-alpha4"]
+                 [reduce-fsm "0.1.3"]])

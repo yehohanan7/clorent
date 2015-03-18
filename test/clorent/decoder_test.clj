@@ -6,20 +6,8 @@
 (def test-torrent (-> "taocp.torrent" io/resource io/file slurp))
 
 
-(deftest should-decode-string
-  (is (= ["abcde" []] (decode-data "5:abcde")))
-  (is (= ["abcde" (seq "fgh")] (decode-data "5:abcdefgh"))))
-
-
-(deftest should-decode-integer
-  (is (= [57 []] (decode-data "i57e")))
-  (is (= [57 (seq "2:ab")] (decode-data "i57e2:ab"))))
-
-
-(deftest should-decode-list
-  (is (= [["ab" "xyz" 57] []] (decode-data "l2:ab3:xyzi57ee"))))
-
-(deftest should-decode-dict
-  (is (= [{"bar" ["ab" "xyz" 57]
-           "foo" 42} []] (decode-data "d3:barl2:ab3:xyzi57ee3:fooi42ee"))))
-
+(deftest decode-test
+  (is (= "abcde" (decode "5:abcde")))
+  (is (= 57 (decode "i57e")))
+  (is (= {57 "ab"} (decode "di57e2:abe")))
+  (is (= {"foo" "ab" "bar" ["mm" 7]} (decode "d3:foo2:ab3:barl2:mmi7eee"))))
