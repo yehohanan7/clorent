@@ -11,28 +11,35 @@
   (if (empty? xs) 0
       (read-string (apply str xs))))
 
+(defn raise! [value]
+  (throw (Exception. value)))
+
 (defn decode-string [[x & xs] acc]
-  (if (= \: x)
-    (-> acc seq->num (split-at xs) (update-in [0] seq->str))
-    (recur xs (conj acc x))))
+  (cond
+    (nil? x) (raise! "error decoding string")
+    (= \: x) (-> acc seq->num (split-at xs) (update-in [0] seq->str))
+    :else (recur xs (conj acc x))))
 
 (defn decode-integer [[x & xs] acc]
-  (if (= \e x)
-    (vector (seq->num acc) (or xs []))
-    (recur xs (conj acc x))))
+  (cond
+    (nil? x) (raise! "error decoding integer")
+    (= \e x) (vector (seq->num acc) (or xs []))
+    :else (recur xs (conj acc x))))
 
 (defn decode-list [[x & xs :as input] acc]
-  (if (= \e x)
-    (vector acc (or xs []))
-    (let [[value rest] (decode-data input)]
-      (recur rest (conj acc value)))))
+  (cond
+    (nil? x) (raise! "error decoding list")
+    (= \e x) (vector acc (or xs []))
+    :else (let [[value rest] (decode-data input)]
+            (recur rest (conj acc value)))))
 
 (defn decode-dict [[x & xs :as input] acc]
-  (if (= \e x)
-    (vector acc (or xs []))
-    (let [[key _rest] (decode-data input)
-          [value rest] (decode-data _rest)]
-      (recur rest (assoc acc key value)))))
+  (cond
+    (nil? x) (vector acc [])
+    (= \e x) (vector acc (or xs []))
+    :else (let [[key _rest] (decode-data input)
+                [value rest] (decode-data _rest)]
+            (recur rest (assoc acc key value)))))
 
 (defn decode-data [[x & xs :as input]]
   (condp = x
